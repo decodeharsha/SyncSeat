@@ -1,0 +1,20 @@
+/**
+ * Global styles entry.
+ *
+ * Tailwind v4 is activated via `@import "tailwindcss"` (see Vite plugin).
+ * Keep global resets minimal — prefer utility classes in components/pages.
+ */
+@import 'tailwindcss';
+
+/* App-wide defaults (light touch; Tailwind handles most layout) */
+html {
+  @apply antialiased;
+}
+
+body {
+  @apply m-0 min-h-dvh bg-slate-950 text-slate-100;
+}
+
+#root {
+  @apply min-h-dvh;
+}
