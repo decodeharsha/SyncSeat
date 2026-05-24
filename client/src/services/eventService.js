@@ -1,26 +1,24 @@
 /**
  * Events API — domain-specific calls for SyncSeat.
  *
- * WHY SERVICE FILES EXIST
- * -----------------------
- * Service modules are the single place that knows *how* to talk to the backend
- * (URLs, HTTP verbs, response shape). Pages and components stay focused on UI
- * and user flows. When the API changes, you update one file instead of hunting
- * through every screen that fetches events.
+ * WHY SERVICE FILES CENTRALIZE API REQUESTS
+ * -----------------------------------------
+ * Every endpoint (list, create, update) lives in one module. URLs, HTTP verbs,
+ * and response parsing are defined once. When the backend changes, you update
+ * this file instead of every page that talks to events.
  *
- * WHY PAGES SHOULD NOT CALL AXIOS DIRECTLY
+ * WHY PAGES SHOULD NOT DIRECTLY CALL AXIOS
  * ----------------------------------------
- * If each page imported `api` and built its own `GET /api/events` call, you would
- * duplicate base URLs, auth headers, error handling, and response parsing. That
- * makes bugs likely and refactors painful. Pages should call `fetchEvents()` (or a
- * hook that wraps it), not Axios.
+ * Axios setup (base URL, auth headers, interceptors) belongs in `apiClient.js`.
+ * Pages should call `fetchEvents()` or `createEvent()` so UI code never repeats
+ * `api.post('/api/events', ...)` or handles raw response objects.
  *
- * WHY WE RETURN ONLY DATA (NOT THE FULL AXIOS RESPONSE)
- * -----------------------------------------------------
- * An Axios response includes `status`, `headers`, `config`, and more — UI code
- * does not need that noise. We destructure `{ data }` from the response and return
- * the event list from the API body so components receive a plain array they can
- * map over: `events.map(...)` instead of `response.data.data.map(...)`.
+ * WHY RETURNING RESPONSE DATA KEEPS COMPONENTS CLEANER
+ * ----------------------------------------------------
+ * We destructure `{ data }` from Axios and return the useful payload (event list
+ * or created event), not the full response with `status`, `headers`, and
+ * `config`. Components work with plain data: `events.map(...)` or the new event
+ * object after create — not `response.data.data`.
  */
 
 import { api } from './apiClient.js'
@@ -36,12 +34,17 @@ export async function fetchEvents() {
 }
 
 /**
- * Create a new event via POST /api/events.
+ * Create a new event.
  *
- * @param {{ title: string, venue: string, date: string }} payload
+ * @param {{ title: string, venue: string, date: string }} eventData
  * @returns {Promise<{ id: number, title: string, venue: string, date: string }>}
  */
-export async function createEvent({ title, venue, date }) {
-  const { data } = await api.post('/api/events', { title, venue, date })
+export async function createEvent(eventData) {
+  const { data } = await api.post('/api/events', {
+    title: eventData.title,
+    venue: eventData.venue,
+    date: eventData.date,
+  })
+
   return data.data
 }

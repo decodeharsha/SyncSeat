@@ -16,8 +16,19 @@
  * 1. User clicks Submit → `handleSubmit` runs
  * 2. `e.preventDefault()` stops a full page reload
  * 3. `createEvent()` sends JSON to the API
- * 4. On success: clear fields, show success message
+ * 4. On success: clear fields, show success message, then redirect home
  * 5. On failure: show error message
+ *
+ * useNavigate
+ * -----------
+ * `useNavigate()` returns a function to change routes without reloading the page.
+ * After creating an event we call `navigate('/')` so the user lands on Home.
+ *
+ * WHY REDIRECTING IMPROVES UX
+ * ---------------------------
+ * A short success message confirms the save; sending users to Home lets them
+ * see the updated event list and continue browsing instead of staying on an
+ * empty form wondering what to do next.
  *
  * ASYNC API HANDLING
  * ------------------
@@ -26,7 +37,8 @@
  * the request completes (success or error).
  */
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { createEvent } from '../services/eventService.js'
 
 function FieldIcon({ children }) {
@@ -38,6 +50,8 @@ function FieldIcon({ children }) {
 }
 
 export function CreateEventPage() {
+  const navigate = useNavigate()
+
   const [title, setTitle] = useState('')
   const [venue, setVenue] = useState('')
   const [date, setDate] = useState('')
@@ -45,6 +59,17 @@ export function CreateEventPage() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
+
+  /** Brief success feedback, then redirect to Home so the user sees updated events. */
+  useEffect(() => {
+    if (!success) return
+
+    const redirectTimer = setTimeout(() => {
+      navigate('/')
+    }, 1000)
+
+    return () => clearTimeout(redirectTimer)
+  }, [success, navigate])
 
   async function handleSubmit(e) {
     e.preventDefault()
