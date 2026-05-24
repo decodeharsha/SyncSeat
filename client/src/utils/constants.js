@@ -10,6 +10,7 @@ export const ROUTES = {
   home: '/',
   login: '/login',
   dashboard: '/dashboard',
+  createEvent: '/dashboard/events/create',
 }
 
 /** localStorage keys — keep unique to avoid collisions with third-party scripts */

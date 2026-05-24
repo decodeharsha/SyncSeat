@@ -28,9 +28,9 @@ export function DashboardLayout() {
             Overview
           </NavLink>
           {/* Placeholder links — wire to real pages as the product grows */}
-          <span className="block cursor-not-allowed rounded-md px-3 py-2 text-sm text-slate-600">
-            Events (soon)
-          </span>
+          <NavLink to={ROUTES.createEvent} className={subLink}>
+            Create event
+          </NavLink>
           <span className="block cursor-not-allowed rounded-md px-3 py-2 text-sm text-slate-600">
             Bookings (soon)
           </span>

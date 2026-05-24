@@ -34,3 +34,14 @@ export async function fetchEvents() {
   const { data } = await api.get('/api/events')
   return data.data
 }
+
+/**
+ * Create a new event via POST /api/events.
+ *
+ * @param {{ title: string, venue: string, date: string }} payload
+ * @returns {Promise<{ id: number, title: string, venue: string, date: string }>}
+ */
+export async function createEvent({ title, venue, date }) {
+  const { data } = await api.post('/api/events', { title, venue, date })
+  return data.data
+}
