@@ -30,6 +30,7 @@
  */
 
 import { prisma } from "../config/prisma.js";
+import { AppError } from "../utils/AppError.js";
 
 /**
  * Return all events for listing (public browse, dashboards, etc.).
@@ -41,4 +42,42 @@ export async function getAllEvents() {
   });
 
   return events;
+}
+
+/**
+ * Create a new event and persist it to the database.
+ *
+ * WHY DATABASE LOGIC LIVES IN THE SERVICE
+ * ---------------------------------------
+ * `create()` knows table columns, types, and defaults. Controllers only pass
+ * plain fields from the HTTP body; this function turns them into a Prisma call.
+ *
+ * WHAT Prisma create() DOES
+ * -------------------------
+ * `prisma.event.create({ data: { ... } })` runs an INSERT for one row and
+ * returns the saved record (including auto-generated `id`). Unlike createMany(),
+ * create() inserts a single row and gives you the full object back.
+ *
+ * @param {{ title: string, venue: string, date: string | Date }} input
+ * @returns {Promise<{ id: number, title: string, venue: string, date: Date }>}
+ */
+export async function createEvent({ title, venue, date }) {
+  if (!title?.trim() || !venue?.trim() || !date) {
+    throw new AppError("title, venue, and date are required", 400);
+  }
+
+  const parsedDate = new Date(date);
+  if (Number.isNaN(parsedDate.getTime())) {
+    throw new AppError("date must be a valid date or ISO string", 400);
+  }
+
+  const event = await prisma.event.create({
+    data: {
+      title: title.trim(),
+      venue: venue.trim(),
+      date: parsedDate,
+    },
+  });
+
+  return event;
 }

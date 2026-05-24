@@ -12,9 +12,12 @@
 
 import { Router } from "express";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { getAllEvents } from "../controllers/eventController.js";
+import { getAllEvents, createEvent } from "../controllers/eventController.js";
 
 export const eventRouter = Router();
 
-/** List all events (mock data for now) */
+/** List all events */
 eventRouter.get("/", asyncHandler(getAllEvents));
+
+/** Create a new event */
+eventRouter.post("/", asyncHandler(createEvent));

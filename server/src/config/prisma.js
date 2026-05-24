@@ -10,7 +10,7 @@
  * =============================================================================
  */
 
-import { PrismaClient } from '@prisma.client';
+import { PrismaClient } from "@prisma/client";
 
 /** Singleton — avoids opening many DB connections during hot reload in dev */
 const globalForPrisma = globalThis;
