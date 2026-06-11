@@ -11,6 +11,8 @@ export const ROUTES = {
   login: '/login',
   dashboard: '/dashboard',
   createEvent: '/dashboard/events/create',
+  /** @param {string | number} id */
+  editEvent: (id) => `/dashboard/events/${id}/edit`,
 }
 
 /** localStorage keys — keep unique to avoid collisions with third-party scripts */

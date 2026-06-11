@@ -12,7 +12,13 @@
 
 import { Router } from "express";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { getAllEvents, createEvent } from "../controllers/eventController.js";
+import {
+  getAllEvents,
+  getEventById,
+  createEvent,
+  updateEvent,
+  deleteEvent,
+} from "../controllers/eventController.js";
 
 export const eventRouter = Router();
 
@@ -21,3 +27,12 @@ eventRouter.get("/", asyncHandler(getAllEvents));
 
 /** Create a new event */
 eventRouter.post("/", asyncHandler(createEvent));
+
+/** Get one event by id — define after `/` so the list route is not shadowed */
+eventRouter.get("/:id", asyncHandler(getEventById));
+
+/** Update one event by id */
+eventRouter.put("/:id", asyncHandler(updateEvent));
+
+/** Delete one event by id */
+eventRouter.delete("/:id", asyncHandler(deleteEvent));

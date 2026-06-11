@@ -16,9 +16,14 @@
  * WHY RETURNING RESPONSE DATA KEEPS COMPONENTS CLEANER
  * ----------------------------------------------------
  * We destructure `{ data }` from Axios and return the useful payload (event list
- * or created event), not the full response with `status`, `headers`, and
- * `config`. Components work with plain data: `events.map(...)` or the new event
- * object after create — not `response.data.data`.
+ * or a single event), not the full response with `status`, `headers`, and
+ * `config`. Components work with plain data — not `response.data.data`.
+ *
+ * DYNAMIC ROUTE PARAMETERS
+ * ------------------------
+ * Endpoints like `/api/events/:id` need an id in the URL. Service functions
+ * accept `id` as an argument and build the path (`/api/events/${id}`) so pages
+ * pass a number or string without hand-crafting URLs in every component.
  */
 
 import { api } from './apiClient.js'
@@ -47,4 +52,43 @@ export async function createEvent(eventData) {
   })
 
   return data.data
+}
+
+/**
+ * Fetch one event by id.
+ *
+ * @param {string | number} id — inserted into GET /api/events/:id
+ * @returns {Promise<{ id: number, title: string, venue: string, date: string }>}
+ */
+export async function fetchEventById(id) {
+  const { data } = await api.get(`/api/events/${id}`)
+  return data.data
+}
+
+/**
+ * Update an existing event.
+ *
+ * @param {string | number} id — inserted into PUT /api/events/:id
+ * @param {{ title: string, venue: string, date: string }} eventData
+ * @returns {Promise<{ id: number, title: string, venue: string, date: string }>}
+ */
+export async function updateEvent(id, eventData) {
+  const { data } = await api.put(`/api/events/${id}`, {
+    title: eventData.title,
+    venue: eventData.venue,
+    date: eventData.date,
+  })
+
+  return data.data
+}
+
+/**
+ * Delete an event by id.
+ *
+ * @param {string | number} id — inserted into DELETE /api/events/:id
+ * @returns {Promise<{ success: boolean, message: string }>}
+ */
+export async function deleteEvent(id) {
+  const { data } = await api.delete(`/api/events/${id}`)
+  return data
 }

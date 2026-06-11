@@ -18,6 +18,7 @@ import { HomePage } from '../pages/HomePage.jsx'
 import { LoginPage } from '../pages/LoginPage.jsx'
 import { DashboardPage } from '../pages/DashboardPage.jsx'
 import { CreateEventPage } from '../pages/CreateEventPage.jsx'
+import { EditEventPage } from '../pages/EditEventPage.jsx'
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
               {
                 path: 'events/create',
                 element: <CreateEventPage />,
+              },
+              {
+                path: 'events/:id/edit',
+                element: <EditEventPage />,
               },
             ],
           },
