@@ -9,6 +9,7 @@
 export const ROUTES = {
   home: '/',
   login: '/login',
+  register: '/register',
   dashboard: '/dashboard',
   createEvent: '/dashboard/events/create',
   /** @param {string | number} id */

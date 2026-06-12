@@ -3,8 +3,8 @@
  *
  * Architectural decisions:
  * - One `create()` instance enforces a consistent baseURL, timeouts, and headers.
- * - Request interceptor attaches JWT (or session token) from storage; swap the
- *   storage mechanism later without touching every service module.
+ * - Request interceptor reads the JWT from localStorage and sends
+ *   `Authorization: Bearer <token>` on every API call when the user is signed in.
  * - Response interceptor is the right place for global 401 handling / refresh
  *   tokens when you connect a real auth API.
  */

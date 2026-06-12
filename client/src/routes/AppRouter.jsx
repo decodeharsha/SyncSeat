@@ -13,9 +13,11 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { RootLayout } from '../layouts/RootLayout.jsx'
 import { DashboardLayout } from '../layouts/DashboardLayout.jsx'
+import { AdminRoute } from '../components/AdminRoute.jsx'
 import { ProtectedRoute } from '../components/ProtectedRoute.jsx'
 import { HomePage } from '../pages/HomePage.jsx'
 import { LoginPage } from '../pages/LoginPage.jsx'
+import { RegisterPage } from '../pages/RegisterPage.jsx'
 import { DashboardPage } from '../pages/DashboardPage.jsx'
 import { CreateEventPage } from '../pages/CreateEventPage.jsx'
 import { EditEventPage } from '../pages/EditEventPage.jsx'
@@ -27,6 +29,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: 'login', element: <LoginPage /> },
+      { path: 'register', element: <RegisterPage /> },
       {
         path: 'dashboard',
         element: <ProtectedRoute />,
@@ -36,12 +39,17 @@ const router = createBrowserRouter([
             children: [
               { index: true, element: <DashboardPage /> },
               {
-                path: 'events/create',
-                element: <CreateEventPage />,
-              },
-              {
-                path: 'events/:id/edit',
-                element: <EditEventPage />,
+                element: <AdminRoute />,
+                children: [
+                  {
+                    path: 'events/create',
+                    element: <CreateEventPage />,
+                  },
+                  {
+                    path: 'events/:id/edit',
+                    element: <EditEventPage />,
+                  },
+                ],
               },
             ],
           },

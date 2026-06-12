@@ -18,7 +18,7 @@ const linkClass = ({ isActive }) =>
   ].join(' ')
 
 export function AppHeader() {
-  const { isAuthenticated, logout } = useAuth()
+  const { user, isAuthenticated, logout } = useAuth()
 
   return (
     <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
@@ -29,26 +29,33 @@ export function AppHeader() {
         >
           SyncSeat
         </NavLink>
-        <nav className="flex flex-wrap items-center gap-1">
+        <nav className="flex flex-wrap items-center gap-2">
           <NavLink to={ROUTES.home} className={linkClass} end>
             Home
           </NavLink>
-          <NavLink to={ROUTES.login} className={linkClass}>
-            Login
-          </NavLink>
-          {isAuthenticated && (
-            <NavLink to={ROUTES.dashboard} className={linkClass}>
-              Dashboard
-            </NavLink>
+          {!isAuthenticated && (
+            <>
+              <NavLink to={ROUTES.register} className={linkClass}>
+                Register
+              </NavLink>
+              <NavLink to={ROUTES.login} className={linkClass}>
+                Login
+              </NavLink>
+            </>
           )}
           {isAuthenticated && (
-            <button
-              type="button"
-              onClick={logout}
-              className="ml-1 rounded-md border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:border-slate-500 hover:text-white"
-            >
-              Log out
-            </button>
+            <>
+              <span className="px-2 text-sm font-medium text-slate-300">
+                {user?.name}
+              </span>
+              <button
+                type="button"
+                onClick={logout}
+                className="rounded-md border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:border-slate-500 hover:text-white"
+              >
+                Logout
+              </button>
+            </>
           )}
         </nav>
       </div>

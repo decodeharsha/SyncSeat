@@ -12,6 +12,8 @@
 
 import { Router } from "express";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { authenticate } from "../middleware/authMiddleware.js";
+import { requireAdmin } from "../middleware/roleMiddleware.js";
 import {
   getAllEvents,
   getEventById,
@@ -22,17 +24,27 @@ import {
 
 export const eventRouter = Router();
 
-/** List all events */
+/** List all events — public read */
 eventRouter.get("/", asyncHandler(getAllEvents));
 
-/** Create a new event */
-eventRouter.post("/", asyncHandler(createEvent));
+/** Create a new event — admin only */
+eventRouter.post("/", authenticate, requireAdmin, asyncHandler(createEvent));
 
-/** Get one event by id — define after `/` so the list route is not shadowed */
+/** Get one event by id — public read; define after `/` so list is not shadowed */
 eventRouter.get("/:id", asyncHandler(getEventById));
 
-/** Update one event by id */
-eventRouter.put("/:id", asyncHandler(updateEvent));
+/** Update one event by id — admin only */
+eventRouter.put(
+  "/:id",
+  authenticate,
+  requireAdmin,
+  asyncHandler(updateEvent),
+);
 
-/** Delete one event by id */
-eventRouter.delete("/:id", asyncHandler(deleteEvent));
+/** Delete one event by id — admin only */
+eventRouter.delete(
+  "/:id",
+  authenticate,
+  requireAdmin,
+  asyncHandler(deleteEvent),
+);

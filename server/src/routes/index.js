@@ -13,8 +13,10 @@
 import { Router } from "express";
 import { healthRouter } from "./health.routes.js";
 import { eventRouter } from "./eventRoutes.js";
+import { authRouter } from "./authRoutes.js";
 
 export const apiRouter = Router();
 
 apiRouter.use("/health", healthRouter);
 apiRouter.use("/events", eventRouter);
+apiRouter.use("/auth", authRouter);

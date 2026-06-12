@@ -1,15 +1,14 @@
 /**
- * Login screen — authenticate with email and password.
+ * Register screen — create a new SyncSeat account.
  *
- * LOGIN FLOW
- * ----------
- * Submit → `login()` in Auth Context → POST /api/auth/login → JWT stored in
- * localStorage → user profile loaded into context → redirect to dashboard.
+ * Submits to POST /api/auth/register and shows a success message when the
+ * account is created. Users can then sign in from the login page.
  */
 
 import { useState } from 'react'
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
+import { registerUser } from '../services/authService.js'
 import { ROUTES } from '../utils/constants.js'
 
 function FieldIcon({ children }) {
@@ -24,37 +23,44 @@ function getErrorMessage(error, fallback) {
   return error?.response?.data?.error?.message ?? fallback
 }
 
-export function LoginPage() {
-  const { login, isAuthenticated, isLoading } = useAuth()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const from = location.state?.from || ROUTES.dashboard
+export function RegisterPage() {
+  const { isAuthenticated } = useAuth()
 
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
 
-  if (!isLoading && isAuthenticated) {
-    return <Navigate to={from} replace />
+  if (isAuthenticated) {
+    return <Navigate to={ROUTES.dashboard} replace />
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
+    setSuccess(false)
 
-    if (!email.trim() || !password) {
-      setError('Please enter your email and password.')
+    if (!name.trim() || !email.trim() || !password) {
+      setError('Please fill in name, email, and password.')
       return
     }
 
     setSubmitting(true)
 
     try {
-      await login(email.trim(), password)
-      navigate(from, { replace: true })
+      await registerUser({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+      })
+      setSuccess(true)
+      setName('')
+      setEmail('')
+      setPassword('')
     } catch (err) {
-      setError(getErrorMessage(err, 'Could not sign in. Try again.'))
+      setError(getErrorMessage(err, 'Could not create account. Try again.'))
     } finally {
       setSubmitting(false)
     }
@@ -68,15 +74,31 @@ export function LoginPage() {
 
         <header className="relative border-b border-slate-800/80 pb-6">
           <p className="text-xs font-semibold uppercase tracking-widest text-violet-400">
-            Welcome back
+            Get started
           </p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-            Sign in to SyncSeat
+            Create your account
           </h1>
           <p className="mt-2 text-sm text-slate-400 sm:text-base">
-            Access your dashboard and manage events.
+            Join SyncSeat to manage events and bookings.
           </p>
         </header>
+
+        {success && (
+          <div
+            className="relative mt-6 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300"
+            role="status"
+          >
+            User registered successfully. You can{' '}
+            <Link
+              to={ROUTES.login}
+              className="font-semibold text-emerald-200 underline-offset-2 hover:underline"
+            >
+              sign in now
+            </Link>
+            .
+          </div>
+        )}
 
         {error && (
           <div
@@ -92,6 +114,43 @@ export function LoginPage() {
           className="relative mt-8 flex flex-col gap-5"
           noValidate
         >
+          <div>
+            <label
+              htmlFor="name"
+              className="mb-1.5 block text-sm font-medium text-slate-200"
+            >
+              Full name
+            </label>
+            <div className="relative">
+              <FieldIcon>
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                  aria-hidden
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                  />
+                </svg>
+              </FieldIcon>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Alex Morgan"
+                className="w-full rounded-xl border border-slate-700 bg-slate-950/80 py-3 pl-11 pr-4 text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/30"
+              />
+            </div>
+          </div>
+
           <div>
             <label
               htmlFor="email"
@@ -157,10 +216,10 @@ export function LoginPage() {
                 id="password"
                 name="password"
                 type="password"
-                autoComplete="current-password"
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Your password"
+                placeholder="At least 6 characters"
                 className="w-full rounded-xl border border-slate-700 bg-slate-950/80 py-3 pl-11 pr-4 text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/30"
               />
             </div>
@@ -168,26 +227,20 @@ export function LoginPage() {
 
           <button
             type="submit"
-            disabled={submitting || isLoading}
+            disabled={submitting}
             className="mt-2 w-full rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-violet-900/40 transition hover:from-violet-500 hover:to-indigo-500 hover:shadow-violet-800/50 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
           >
-            {submitting ? 'Signing in…' : 'Sign in'}
+            {submitting ? 'Creating account…' : 'Create account'}
           </button>
         </form>
 
         <p className="relative mt-6 text-center text-sm text-slate-500">
-          Need an account?{' '}
+          Already have an account?{' '}
           <Link
-            to={ROUTES.register}
+            to={ROUTES.login}
             className="font-medium text-violet-400 hover:text-violet-300"
           >
-            Create one
-          </Link>
-        </p>
-
-        <p className="relative mt-3 text-center text-sm text-slate-500">
-          <Link to={ROUTES.home} className="text-violet-400 hover:text-violet-300">
-            ← Back to home
+            Sign in
           </Link>
         </p>
       </div>

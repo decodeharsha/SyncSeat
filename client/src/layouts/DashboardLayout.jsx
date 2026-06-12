@@ -6,7 +6,10 @@
  */
 
 import { NavLink, Outlet } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth.js'
 import { ROUTES } from '../utils/constants.js'
+
+const ADMIN_ROLE = 'ADMIN'
 
 const subLink = ({ isActive }) =>
   [
@@ -17,6 +20,9 @@ const subLink = ({ isActive }) =>
   ].join(' ')
 
 export function DashboardLayout() {
+  const { user } = useAuth()
+  const isAdmin = user?.role === ADMIN_ROLE
+
   return (
     <div className="grid flex-1 gap-8 md:grid-cols-[220px_1fr]">
       <aside className="rounded-xl border border-slate-800 bg-slate-900/40 p-3">
@@ -28,9 +34,11 @@ export function DashboardLayout() {
             Overview
           </NavLink>
           {/* Placeholder links — wire to real pages as the product grows */}
-          <NavLink to={ROUTES.createEvent} className={subLink}>
-            Create event
-          </NavLink>
+          {isAdmin && (
+            <NavLink to={ROUTES.createEvent} className={subLink}>
+              Create event
+            </NavLink>
+          )}
           <span className="block cursor-not-allowed rounded-md px-3 py-2 text-sm text-slate-600">
             Bookings (soon)
           </span>
